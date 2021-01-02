@@ -9,3 +9,6 @@ outputs/*
 __pycache__*
 condor.egg-info/*
 /tracked/#pensionesdignas.json
+
+
+*~

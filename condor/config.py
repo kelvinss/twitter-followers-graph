@@ -8,7 +8,8 @@ PATHS = {"in": f"{dir_path}/data/fetched/followers/",
          "tracked": f"{dir_path}/data/fetched/tracked/",
          "outputs": f"{dir_path}/outputs/"}
 
-print(PATHS)
+# print(PATHS)
+
 for path in PATHS.values():
     if not os.path.exists(path):
         os.makedirs(path)

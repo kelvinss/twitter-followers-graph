@@ -10,7 +10,7 @@ import tweepy
 import yaml
 from tweepy import TweepError
 from xml.sax.saxutils import escape
-from utils import screen_names, api_neighbours_ids, fetch_neighbours, make_adjacency_matrix
+from utils import screen_names, api_neighbours_ids, fetch_neighbours, make_adjacency_matrix, graph_ego
 from config import PATHS
 
 # Read keys from file that contains
@@ -20,10 +20,12 @@ with open('config.yml', 'r') as f:
     doc = yaml.load(f, Loader=yaml.FullLoader)
     CONSUMER_KEY = doc["CONSUMER_KEY"]
     CONSUMER_SECRET = doc["CONSUMER_SECRET"]
+    USER_TOKEN = doc["USER_TOKEN"]
+    USER_SECRET = doc["USER_SECRET"]
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, retry_delay=60)
-
+auth.set_access_token(USER_TOKEN, USER_SECRET)
 
 def ego_neighbourhood(ego_screenname, direction = "in", force = False):
     """ Get the neighbours of ego and the neighbours of its neighbours
@@ -68,16 +70,17 @@ if __name__ == '__main__':
             time.sleep(60)
 
     if function == 'followers_graph':
+        graph_ego(user, api, direction = "in")
         # Set up users to include in the graph (ego and neighbours)
         ego = api.get_user(user).id   
-        with open(os.path.join(PATHS['in'], str(ego)), 'r') as f:
-            ego_neighbours = [int(id) for line in csv.reader(f) for id in line]
-        make_adjacency_matrix(ego_neighbours, direction = "in", file= user + + '_in.csv')
+        # with open(os.path.join(PATHS['in'], str(ego)), 'r') as f:
+        #     ego_neighbours = [int(id) for line in csv.reader(f) for id in line]
+        # make_adjacency_matrix(ego_neighbours, direction = "in", file= user + '_in.csv')
 
     if function == 'followees_graph':    
-        #graph_ego(screen_name, direction = "out")
+        graph_ego(user, api, direction = "out")
         # Set up users to include in the graph (ego and neighbours)
         ego = api.get_user(user).id
-        with open(os.path.join(PATHS['out'], str(ego)), 'r') as f:
-            ego_neighbours = [int(id) for line in csv.reader(f) for id in line]
-        make_adjacency_matrix(ego_neighbours, direction = "out", file= user + '_out.csv')
+        # with open(os.path.join(PATHS['out'], str(ego)), 'r') as f:
+        #     ego_neighbours = [int(id) for line in csv.reader(f) for id in line]
+        # make_adjacency_matrix(ego_neighbours, direction = "out", file= user + '_out.csv')
